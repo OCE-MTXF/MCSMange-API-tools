@@ -1,0 +1,142 @@
+<Window x:Class="MCSMServerManager.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Icon="/MCSMServerManager;component/ico.ico"
+        Title="设置 - MCSM 服务器管理器 by OCE_MTXF BUG联系oce_mtxf@outlook.com"
+        Height="640" Width="880" MinHeight="520" MinWidth="760"
+        Background="{StaticResource BgBrush}" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
+            <Grid Margin="10,14">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Margin="8,0,0,10">
+                    <Button Content="&#xE72B; 返回主界面" Style="{StaticResource GhostButton}"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                            Click="BackButton_Click" />
+                </StackPanel>
+                <ListBox x:Name="GroupList" Grid.Row="1" BorderThickness="0" Background="Transparent"
+                         SelectionChanged="GroupList_SelectionChanged">
+                    <ListBoxItem Tag="conn"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE7C3;" FontFamily="Segoe MDL2 Assets" Margin="0,0,10,0"/><TextBlock Text="连接"/></StackPanel></ListBoxItem>
+                    <ListBoxItem Tag="log"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE9D5;" FontFamily="Segoe MDL2 Assets" Margin="0,0,10,0"/><TextBlock Text="日志"/></StackPanel></ListBoxItem>
+                    <ListBoxItem Tag="perf"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE9D2;" FontFamily="Segoe MDL2 Assets" Margin="0,0,10,0"/><TextBlock Text="性能监控"/></StackPanel></ListBoxItem>
+                    <ListBoxItem Tag="ui"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE790;" FontFamily="Segoe MDL2 Assets" Margin="0,0,10,0"/><TextBlock Text="界面"/></StackPanel></ListBoxItem>
+                </ListBox>
+                <TextBlock Grid.Row="2" x:Name="ConfigPathText" Style="{StaticResource Muted}"
+                           Margin="8,10,0,0" TextWrapping="Wrap" FontSize="11" />
+            </Grid>
+        </Border>
+
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" x:Name="PageTitle" Style="{StaticResource H1}" Margin="24,20,24,12" Text="连接" />
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="24,0,24,0">
+                <StackPanel>
+                    <Border Style="{StaticResource Card}" Padding="18" Margin="0,0,0,12">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource H2}" Text="凭据保存" Margin="0,0,0,4" />
+                            <TextBlock Style="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,0,0,14"
+                                       Text="API Key 与面板地址相同权限。关闭保存后，程序退出即不再记住密钥。" />
+                            <CheckBox x:Name="SavePanelUrlBox" Content="记住面板地址" Margin="0,0,0,10" />
+                            <CheckBox x:Name="SaveApiKeyBox" Content="记住 API Key（用 Windows DPAPI 加密保存，仅当前 Windows 用户可解密）" Margin="0,0,0,10" />
+                            <CheckBox x:Name="AutoConnectBox" Content="启动时自动连接" Margin="0,0,0,10" />
+                            <CheckBox x:Name="InsecureCertBox" Content="忽略 HTTPS 证书错误（不安全）" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border x:Name="LogCard" Style="{StaticResource Card}" Padding="18" Margin="0,0,0,12" Visibility="Collapsed">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource H2}" Text="日志" Margin="0,0,0,4" />
+                            <TextBlock Style="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,0,0,14"
+                                       Text="启动、连接、用户操作、每次接口请求与异常都会写入安装目录 logs/。密钥在写入前已脱敏。" />
+                            <CheckBox x:Name="LogEnabledBox" Content="启用日志" Margin="0,0,0,10" />
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <TextBlock Text="日志级别" VerticalAlignment="Center" Width="120" />
+                                <ComboBox x:Name="LogLevelBox" Width="160" SelectionChanged="LogLevelBox_SelectionChanged">
+                                    <ComboBoxItem Content="调试" Tag="调试" />
+                                    <ComboBoxItem Content="信息" Tag="信息" />
+                                    <ComboBoxItem Content="警告" Tag="警告" />
+                                    <ComboBoxItem Content="错误" Tag="错误" />
+                                </ComboBox>
+                            </StackPanel>
+                            <CheckBox x:Name="LogHttpBodyBox" Content="记录完整响应体（可能较大）" Margin="0,0,0,10" />
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <TextBlock Text="单文件上限 (MB)" VerticalAlignment="Center" Width="120" />
+                                <TextBox x:Name="LogMaxSizeBox" Width="100" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="保留文件数" VerticalAlignment="Center" Width="120" />
+                                <TextBox x:Name="LogKeepBox" Width="100" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border x:Name="PerfCard" Style="{StaticResource Card}" Padding="18" Margin="0,0,0,12" Visibility="Collapsed">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource H2}" Text="定期性能查询" Margin="0,0,0,4" />
+                            <TextBlock Style="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,0,0,14"
+                                       Text="按设定周期自动刷新面板与节点性能数据。周期可按秒 / 分 / 时换算。" />
+                            <CheckBox x:Name="PerfEnabledBox" Content="启用定时刷新" Margin="0,0,0,10" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="刷新周期" VerticalAlignment="Center" Width="120" />
+                                <TextBox x:Name="PerfValueBox" Width="100" TextChanged="PerfValueBox_TextChanged" />
+                                <ComboBox x:Name="PerfUnitBox" Width="110" Margin="10,0,0,0" SelectionChanged="PerfUnitBox_SelectionChanged">
+                                    <ComboBoxItem Content="秒" Tag="秒" />
+                                    <ComboBoxItem Content="分" Tag="分" />
+                                    <ComboBoxItem Content="时" Tag="时" />
+                                </ComboBox>
+                                <TextBlock x:Name="PerfPreviewText" Style="{StaticResource Muted}"
+                                           Margin="12,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border x:Name="UiCard" Style="{StaticResource Card}" Padding="18" Margin="0,0,0,12" Visibility="Collapsed">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource H2}" Text="界面" Margin="0,0,0,4" />
+                            <TextBlock Style="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,0,0,14"
+                                       Text="界面语言固定为简体中文。" />
+                            <CheckBox x:Name="ShowErrorDetailBox" Content="接口出错时弹出可展开详情的错误弹窗" Margin="0,0,0,10" />
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <TextBlock Text="实例每页条数" VerticalAlignment="Center" Width="120" />
+                                <TextBox x:Name="InstancePageSizeBox" Width="100" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <TextBlock Text="文件每页条数" VerticalAlignment="Center" Width="120" />
+                                <TextBox x:Name="FilePageSizeBox" Width="100" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="日志查看行数" VerticalAlignment="Center" Width="120" />
+                                <TextBox x:Name="LogViewerLinesBox" Width="100" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0" Padding="24,12">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="打开配置文件" Style="{StaticResource GhostButton}" Click="OpenConfigButton_Click" />
+                    <Button Content="恢复默认" Style="{StaticResource GhostButton}" Margin="8,0,0,0" Click="ResetButton_Click" />
+                    <Button Content="保存" Margin="8,0,0,0" IsDefault="True" Click="SaveButton_Click" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

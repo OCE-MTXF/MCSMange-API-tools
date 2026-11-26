@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>MCSMServerManager</AssemblyName>
+    <RootNamespace>MCSMServerManager</RootNamespace>
+    <Version>1.1.0</Version>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
+    <ApplicationIcon>ico.ico</ApplicationIcon>
+    <Product>MCSM Server Manager</Product>
+    <Company>MCSMServerManager</Company>
+    <Description>MCSManager API based Windows server management client</Description>
+    <SatelliteResourceLanguages>zh-Hans;en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="ico.ico" />
+  </ItemGroup>
+
+
+  <!--
+    排除同目录下并行的另一份工程副本（claude修改版\）。
+    该目录含有同名的 MainWindow 等文件，若不排除会被 SDK 的默认通配符
+    一并编译，产生上千个重复定义错误。此处只做编译排除，不删除任何文件。
+  -->
+  <ItemGroup>
+    <Compile Remove="claude修改版\**" />
+    <Page Remove="claude修改版\**" />
+    <ApplicationDefinition Remove="claude修改版\**" />
+    <Resource Remove="claude修改版\**" />
+    <EmbeddedResource Remove="claude修改版\**" />
+    <None Remove="claude修改版\**" />
+  </ItemGroup>
+</Project>

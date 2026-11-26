@@ -1,0 +1,494 @@
+<Window x:Class="MCSMServerManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Icon="/MCSMServerManager;component/ico.ico"
+        Title="MCSM 服务器管理器 by OCE_MTXF BUG联系oce_mtxf@outlook.com"
+        Height="860" Width="1360" MinHeight="640" MinWidth="1100"
+        Background="{StaticResource BgBrush}"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- ================= 连接栏 ================= -->
+        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1" Padding="16,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="面板地址" VerticalAlignment="Center" Margin="0,0,8,0" />
+                <TextBox Grid.Column="1" x:Name="AddressBox" MinWidth="240" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="2" Text="API Key" VerticalAlignment="Center" Margin="12,0,8,0" />
+                <PasswordBox Grid.Column="3" x:Name="ApiKeyBox" Width="200" VerticalAlignment="Center" />
+                <Button Grid.Column="4" x:Name="ConnectButton" Content="连接" Margin="12,0,0,0"
+                        Click="ConnectButton_Click" />
+                <StackPanel Grid.Column="5" Orientation="Horizontal" Margin="14,0,0,0" VerticalAlignment="Center">
+                    <CheckBox x:Name="InsecureCertCheck" Content="忽略证书错误（不安全）"
+                              VerticalAlignment="Center"
+                              ToolTip="仅在面板使用自签名 HTTPS 证书时勾选。勾选后连接不再校验证书，API Key 可能被中间人窃取。"
+                              Checked="InsecureCertCheck_Changed"
+                              Unchecked="InsecureCertCheck_Changed" />
+                    <Ellipse x:Name="StatusDot" Width="9" Height="9" Fill="{StaticResource MutedBrush}"
+                             VerticalAlignment="Center" Margin="12,0,0,0" />
+                    <TextBlock x:Name="StatusText" Text="未连接" Margin="6,0,0,0" VerticalAlignment="Center" />
+                    <Border x:Name="InsecureWarnBadge" Visibility="Collapsed" Margin="10,0,0,0"
+                            VerticalAlignment="Center" Padding="6,1" CornerRadius="3"
+                            Background="{StaticResource WarnBrush}">
+                        <TextBlock Text="证书未校验" Foreground="White" FontSize="11" />
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" x:Name="ContentRoot">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="228" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- ================= 侧边栏 ================= -->
+            <Border Grid.Column="0" Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Margin="14,14,10,0">
+                        <TextBlock Style="{StaticResource H2}" Text="MCSM 管理器" />
+                        <TextBlock Style="{StaticResource Muted}" FontSize="11" Margin="0,2,0,0"
+                                   x:Name="PanelSummaryText" Text="尚未连接" />
+                    </StackPanel>
+
+                    <ListBox x:Name="NavList" Grid.Row="1" Margin="6,6,6,0" BorderThickness="0"
+                             Background="Transparent" SelectionChanged="NavList_SelectionChanged">
+                        <TextBlock Style="{StaticResource NavSectionLabel}" Text="面板" />
+                        <ListBoxItem Style="{StaticResource NavItem}" Tag="overview" AutomationProperties.Name="概览">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE80F;" FontFamily="Segoe MDL2 Assets" Width="22" />
+                                <TextBlock Text="概览" />
+                            </StackPanel>
+                        </ListBoxItem>
+                        <ListBoxItem Style="{StaticResource NavItem}" Tag="instances" AutomationProperties.Name="实例">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE8EC;" FontFamily="Segoe MDL2 Assets" Width="22" />
+                                <TextBlock Text="实例" />
+                            </StackPanel>
+                        </ListBoxItem>
+                        <ListBoxItem Style="{StaticResource NavItem}" Tag="nodes" AutomationProperties.Name="节点">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE9D2;" FontFamily="Segoe MDL2 Assets" Width="22" />
+                                <TextBlock Text="节点" />
+                            </StackPanel>
+                        </ListBoxItem>
+                        <ListBoxItem Style="{StaticResource NavItem}" Tag="users" AutomationProperties.Name="用户">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE77F;" FontFamily="Segoe MDL2 Assets" Width="22" />
+                                <TextBlock Text="用户" />
+                            </StackPanel>
+                        </ListBoxItem>
+
+                        <TextBlock Style="{StaticResource NavSectionLabel}" Text="管理" />
+                        <ListBoxItem Style="{StaticResource NavItem}" Tag="files" AutomationProperties.Name="文件管理">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets" Width="22" />
+                                <TextBlock Text="文件管理" />
+                            </StackPanel>
+                        </ListBoxItem>
+
+                        <TextBlock Style="{StaticResource NavSectionLabel}" Text="工具" />
+                        <ListBoxItem Style="{StaticResource NavItem}" Tag="applog" AutomationProperties.Name="运行日志">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE9D5;" FontFamily="Segoe MDL2 Assets" Width="22" />
+                                <TextBlock Text="运行日志" />
+                            </StackPanel>
+                        </ListBoxItem>
+                        <ListBoxItem Style="{StaticResource NavItem}" Tag="perf" AutomationProperties.Name="性能监控">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE9F9;" FontFamily="Segoe MDL2 Assets" Width="22" />
+                                <TextBlock Text="性能监控" />
+                            </StackPanel>
+                        </ListBoxItem>
+                    </ListBox>
+
+                    <StackPanel Grid.Row="2" Margin="10,0,10,12">
+                        <Border Height="1" Background="{StaticResource LineBrush}" Margin="4,0,4,6" />
+                        <Button Style="{StaticResource NavButton}" x:Name="SettingsNavItem"
+                                     Click="SettingsNavItem_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets" Width="22" />
+                                <TextBlock Text="设置" />
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" x:Name="AboutNavItem"
+                                     Click="AboutNavItem_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE946;" FontFamily="Segoe MDL2 Assets" Width="22" />
+                                <TextBlock Text="关于与鸣谢" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ================= 内容区 ================= -->
+            <Grid Grid.Column="1">
+                <!-- 概览 -->
+                <Grid x:Name="OverviewView" Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="面板概览" Style="{StaticResource H1}" Margin="0,0,0,14" />
+                    <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,14">
+                        <Border Style="{StaticResource Card}" Margin="0,0,12,0" Padding="16">
+                            <StackPanel><TextBlock Style="{StaticResource MetricLabel}" Text="面板版本"/>
+                                <TextBlock Style="{StaticResource MetricValue}" x:Name="PanelVersionText" Text="-"/></StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}" Margin="0,0,12,0" Padding="16">
+                            <StackPanel><TextBlock Style="{StaticResource MetricLabel}" Text="在线节点"/>
+                                <TextBlock Style="{StaticResource MetricValue}" x:Name="NodeCountText" Text="-"/></StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}" Margin="0,0,12,0" Padding="16">
+                            <StackPanel><TextBlock Style="{StaticResource MetricLabel}" Text="系统 CPU"/>
+                                <TextBlock Style="{StaticResource MetricValue}" x:Name="CpuText" Text="-"/></StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}" Padding="16">
+                            <StackPanel><TextBlock Style="{StaticResource MetricLabel}" Text="系统内存"/>
+                                <TextBlock Style="{StaticResource MetricValue}" x:Name="MemText" Text="-"/></StackPanel>
+                        </Border>
+                    </UniformGrid>
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="节点" Style="{StaticResource H2}" Margin="0,0,0,10" />
+                        <DataGrid Grid.Row="1" x:Name="OverviewGrid">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="节点" Binding="{Binding DisplayName}" Width="2*" />
+                                <DataGridTextColumn Header="地址" Binding="{Binding Endpoint}" Width="2*" />
+                                <DataGridTextColumn Header="状态" Binding="{Binding StateText}" Width="*" />
+                                <DataGridTextColumn Header="版本" Binding="{Binding Version}" Width="*" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                    <Border Grid.Row="3" Style="{StaticResource Card}" Padding="14" Margin="0,14,0,0">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource H2}" Text="最近日志" Margin="0,0,0,8" />
+                            <TextBox x:Name="RecentLogBox" IsReadOnly="True" AcceptsReturn="True"
+                                     TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto"
+                                     HorizontalScrollBarVisibility="Auto" Height="110"
+                                     FontFamily="Consolas, Microsoft YaHei UI" FontSize="11" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- 实例（网页版卡片风格） -->
+                <Grid x:Name="InstancesView" Margin="20" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="应用实例" Style="{StaticResource H1}" Margin="0,0,0,12" />
+                    <WrapPanel Grid.Row="1" Margin="0,0,0,12">
+                        <TextBlock Text="节点" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <ComboBox x:Name="InstanceNodeCombo" Width="220" DisplayMemberPath="DisplayName"
+                                  SelectionChanged="InstanceNodeCombo_SelectionChanged" />
+                        <TextBox x:Name="InstanceFilterBox" Width="200" Margin="10,0,0,0"
+                                 ToolTip="按实例名称过滤" />
+                        <Button Content="查询" Margin="8,0,0,0" Click="RefreshInstancesButton_Click" />
+                        <Button Content="批量操作" Style="{StaticResource GhostButton}" Margin="8,0,0,0"
+                                Click="BatchActionButton_Click" />
+                        <TextBlock x:Name="InstanceCountText" Style="{StaticResource Muted}"
+                                   VerticalAlignment="Center" Margin="16,0,0,0" />
+                    </WrapPanel>
+                    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl x:Name="InstanceCards">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource InstanceCard}">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Nickname}" FontSize="15" FontWeight="SemiBold"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <Border Margin="0,8,0,12">
+                                                <Border.Style>
+                                                    <Style TargetType="Border" BasedOn="{StaticResource StatusPill}">
+                                                        <Setter Property="Background" Value="#F3F4F6" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Status}" Value="3">
+                                                                <Setter Property="Background" Value="#DCFCE7" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Status}" Value="0">
+                                                                <Setter Property="Background" Value="#F3F4F6" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Status}" Value="-1">
+                                                                <Setter Property="Background" Value="#FEF3C7" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Status}" Value="1">
+                                                                <Setter Property="Background" Value="#FEF3C7" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Status}" Value="2">
+                                                                <Setter Property="Background" Value="#DBEAFE" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <TextBlock Style="{StaticResource StatusPillText}" Text="{Binding StatusText}" />
+                                            </Border>
+                                            <Grid Margin="0,0,0,4">
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Style="{StaticResource MetricLabel}" Text="实例类型"/>
+                                                <TextBlock Grid.Column="1" Style="{StaticResource MetricLabel}" Text="{Binding FriendlyType}" Margin="10,0,0,0"/>
+                                            </Grid>
+                                            <Grid Margin="0,0,0,4">
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Style="{StaticResource MetricLabel}" Text="启动时间"/>
+                                                <TextBlock Grid.Column="1" Style="{StaticResource MetricLabel}" Text="{Binding LastStartedText}" Margin="10,0,0,0"/>
+                                            </Grid>
+                                            <Grid Margin="0,0,0,12">
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Style="{StaticResource MetricLabel}" Text="玩家"/>
+                                                <TextBlock Grid.Column="1" Style="{StaticResource MetricLabel}" Text="{Binding PlayersText}" Margin="10,0,0,0"/>
+                                            </Grid>
+                                            <WrapPanel>
+                                                                                                <Button Style="{StaticResource IconButton}" ToolTip="启动"
+                                                        AutomationProperties.Name="启动实例" Tag="{Binding}" Click="CardStartButton_Click">
+                                                    <TextBlock Text="&#xE768;" FontFamily="Segoe MDL2 Assets" FontSize="14" />
+                                                </Button>
+                                                                                                <Button Style="{StaticResource IconButton}" ToolTip="停止"
+                                                        AutomationProperties.Name="停止实例" Tag="{Binding}" Click="CardStopButton_Click">
+                                                    <TextBlock Text="&#xE71A;" FontFamily="Segoe MDL2 Assets" FontSize="14" />
+                                                </Button>
+                                                                                                <Button Style="{StaticResource IconButton}" ToolTip="重启"
+                                                        AutomationProperties.Name="重启实例" Tag="{Binding}" Click="CardRestartButton_Click">
+                                                    <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="14" />
+                                                </Button>
+                                                                                                <Button Style="{StaticResource IconButton}" ToolTip="查看日志"
+                                                        AutomationProperties.Name="查看日志" Tag="{Binding}" Click="CardLogButton_Click">
+                                                    <TextBlock Text="&#xE9D5;" FontFamily="Segoe MDL2 Assets" FontSize="14" />
+                                                </Button>
+                                                                                                <Button Style="{StaticResource IconButton}" ToolTip="管理文件"
+                                                        AutomationProperties.Name="管理文件" Tag="{Binding}" Click="CardFilesButton_Click">
+                                                    <TextBlock Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets" FontSize="14" />
+                                                </Button>
+                                                                                                <Button Style="{StaticResource IconButtonDanger}" ToolTip="删除实例"
+                                                        AutomationProperties.Name="删除实例" Tag="{Binding}" Click="CardDeleteButton_Click">
+                                                    <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="14" />
+                                                </Button>
+                                            </WrapPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                    <WrapPanel Grid.Row="3" Margin="0,0,0,10">
+                        <TextBlock x:Name="InstancePageText" Style="{StaticResource Muted}" VerticalAlignment="Center" />
+                        <Button Content="上一页" Style="{StaticResource GhostButton}" Margin="12,0,0,0" Click="PrevInstancePage_Click" />
+                        <Button Content="下一页" Style="{StaticResource GhostButton}" Margin="8,0,0,0" Click="NextInstancePage_Click" />
+                        <Button Content="全部实例" Style="{StaticResource GhostButton}" Margin="8,0,0,0" ToolTip="停止所有正在运行的实例"
+                                Click="StopAllButton_Click" />
+                    </WrapPanel>
+                    <Border Grid.Row="4" Style="{StaticResource Card}" Padding="14">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource H2}" Text="控制台命令" Margin="0,0,0,8" />
+                            <WrapPanel>
+                                <TextBox x:Name="CommandBox" Width="520" />
+                                <Button Content="发送" Margin="8,0,0,0" Click="SendCommandButton_Click" />
+                                <Button Content="查看日志" Style="{StaticResource GhostButton}" Margin="8,0,0,0" Click="ViewLogButton_Click" />
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                <!-- 节点 -->
+                <Grid x:Name="NodesView" Margin="20" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="节点管理" Style="{StaticResource H1}" Margin="0,0,0,12" />
+                    <WrapPanel Grid.Row="1" Margin="0,0,0,12">
+                        <Button Content="刷新" Click="RefreshNodesButton_Click" />
+                        <Button Content="连接节点" Style="{StaticResource GhostButton}" Margin="8,0,0,0" Click="ConnectNodeButton_Click" />
+                        <Button Content="添加节点" Margin="8,0,0,0" Click="AddNodeButton_Click" />
+                        <Button Content="删除节点" Style="{StaticResource DangerButton}" Margin="8,0,0,0" Click="DeleteNodeButton_Click" />
+                    </WrapPanel>
+                    <DataGrid Grid.Row="2" x:Name="NodesGrid">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="节点" Binding="{Binding DisplayName}" Width="2*" />
+                            <DataGridTextColumn Header="IP" Binding="{Binding Ip}" Width="2*" />
+                            <DataGridTextColumn Header="端口" Binding="{Binding Port}" Width="*" />
+                            <DataGridTextColumn Header="前缀" Binding="{Binding Prefix}" Width="*" />
+                            <DataGridTextColumn Header="状态" Binding="{Binding StateText}" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+
+                <!-- 用户 -->
+                <Grid x:Name="UsersView" Margin="20" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="用户管理" Style="{StaticResource H1}" Margin="0,0,0,12" />
+                    <WrapPanel Grid.Row="1" Margin="0,0,0,12">
+                        <TextBox x:Name="UserFilterBox" Width="220" ToolTip="按用户名搜索" />
+                        <Button Content="搜索" Margin="8,0,0,0" Click="UsersButton_Click" />
+                        <Button Content="刷新" Style="{StaticResource GhostButton}" Margin="8,0,0,0" Click="UsersButton_Click" />
+                    </WrapPanel>
+                    <DataGrid Grid.Row="2" x:Name="UsersGrid">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="用户名" Binding="{Binding UserName}" Width="2*" />
+                            <DataGridTextColumn Header="权限" Binding="{Binding PermissionText}" Width="*" />
+                            <DataGridTextColumn Header="实例数" Binding="{Binding InstanceCount}" Width="*" />
+                            <DataGridTextColumn Header="两步验证" Binding="{Binding TwoFactorText}" Width="*" />
+                            <DataGridTextColumn Header="注册时间" Binding="{Binding RegisterTime}" Width="2*" />
+                            <DataGridTextColumn Header="最近登录" Binding="{Binding LoginTime}" Width="2*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <WrapPanel Grid.Row="3" Margin="0,10,0,0">
+                        <TextBlock x:Name="UserPageText" Style="{StaticResource Muted}" VerticalAlignment="Center" />
+                        <Button Content="上一页" Style="{StaticResource GhostButton}" Margin="12,0,0,0" Click="PrevUserPage_Click" />
+                        <Button Content="下一页" Style="{StaticResource GhostButton}" Margin="8,0,0,0" Click="NextUserPage_Click" />
+                    </WrapPanel>
+                </Grid>
+
+                <!-- 文件管理 -->
+                <Grid x:Name="FilesView" Margin="20" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="文件管理" Style="{StaticResource H1}" Margin="0,0,0,12" />
+                    <WrapPanel Grid.Row="1" Margin="0,0,0,8">
+                        <Button Content="上级目录" Style="{StaticResource GhostButton}" Click="UpDirButton_Click" />
+                        <Button Content="刷新" Margin="8,0,0,0" Click="RefreshFilesButton_Click" />
+                        <Button Content="新建文件夹" Margin="8,0,0,0" Click="NewFolderButton_Click" />
+                        <Button Content="新建文件" Margin="8,0,0,0" Click="NewFileButton_Click" />
+                        <Button Content="编辑" Margin="8,0,0,0" Click="EditFileButton_Click" />
+                        <Button Content="重命名" Margin="8,0,0,0" Click="RenameFileButton_Click" />
+                        <Button Content="复制" Margin="8,0,0,0" Click="CopyFileButton_Click" />
+                        <Button Content="打包" Margin="8,0,0,0" Click="CompressFileButton_Click" />
+                        <Button Content="解压" Margin="8,0,0,0" Click="DecompressFileButton_Click" />
+                        <Button Content="URL 下载" Margin="8,0,0,0" Click="DownloadUrlButton_Click" />
+                        <Button Content="删除" Style="{StaticResource DangerButton}" Margin="8,0,0,0" Click="DeleteFileButton_Click" />
+                        <Button Content="查看原始响应" Style="{StaticResource GhostButton}" Margin="8,0,0,0"
+                                Click="ViewLastResponseButton_Click" />
+                    </WrapPanel>
+                    <TextBlock Grid.Row="2" x:Name="CurrentPathText" Style="{StaticResource Muted}" Margin="0,0,0,10"
+                               TextTrimming="CharacterEllipsis" />
+                    <DataGrid Grid.Row="3" x:Name="FilesGrid" MouseDoubleClick="FilesGrid_MouseDoubleClick"
+                              SelectionMode="Extended">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="3*" />
+                            <DataGridTextColumn Header="类型" Binding="{Binding TypeText}" Width="*" />
+                            <DataGridTextColumn Header="大小" Binding="{Binding SizeText}" Width="*" />
+                            <DataGridTextColumn Header="权限" Binding="{Binding Mode}" Width="*" />
+                            <DataGridTextColumn Header="修改时间" Binding="{Binding Time}" Width="2*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <WrapPanel Grid.Row="4" Margin="0,10,0,0">
+                        <TextBlock x:Name="FilePageText" Style="{StaticResource Muted}" VerticalAlignment="Center" />
+                        <Button Content="上一页" Style="{StaticResource GhostButton}" Margin="12,0,0,0" Click="PrevFilePage_Click" />
+                        <Button Content="下一页" Style="{StaticResource GhostButton}" Margin="8,0,0,0" Click="NextFilePage_Click" />
+                    </WrapPanel>
+                </Grid>
+
+                <!-- 运行日志 -->
+                <Grid x:Name="AppLogView" Margin="20" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="运行日志" Style="{StaticResource H1}" Margin="0,0,0,12" />
+                    <WrapPanel Grid.Row="1" Margin="0,0,0,12">
+                        <Button Content="刷新" Click="RefreshAppLogButton_Click" />
+                        <Button Content="打开日志目录" Style="{StaticResource GhostButton}" Margin="8,0,0,0" Click="OpenLogDirButton_Click" />
+                        <Button Content="复制全部" Style="{StaticResource GhostButton}" Margin="8,0,0,0" Click="CopyAppLogButton_Click" />
+                        <TextBlock x:Name="AppLogPathText" Style="{StaticResource Muted}" VerticalAlignment="Center" Margin="16,0,0,0" />
+                    </WrapPanel>
+                    <TextBox Grid.Row="2" x:Name="AppLogBox" IsReadOnly="True" AcceptsReturn="True"
+                             TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto"
+                             HorizontalScrollBarVisibility="Auto"
+                             FontFamily="Consolas, Microsoft YaHei UI" FontSize="12" />
+                </Grid>
+
+                <!-- 性能监控 -->
+                <Grid x:Name="PerfView" Margin="20" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="数据监控" Style="{StaticResource H1}" Margin="0,0,0,12" />
+                    <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,14">
+                        <Border Style="{StaticResource Card}" Margin="0,0,12,0" Padding="16">
+                            <StackPanel><TextBlock Style="{StaticResource MetricLabel}" Text="面板 CPU"/>
+                                <TextBlock Style="{StaticResource MetricValue}" x:Name="PerfCpuText" Text="-"/></StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}" Margin="0,0,12,0" Padding="16">
+                            <StackPanel><TextBlock Style="{StaticResource MetricLabel}" Text="面板内存"/>
+                                <TextBlock Style="{StaticResource MetricValue}" x:Name="PerfMemText" Text="-"/></StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}" Margin="0,0,12,0" Padding="16">
+                            <StackPanel><TextBlock Style="{StaticResource MetricLabel}" Text="节点数量"/>
+                                <TextBlock Style="{StaticResource MetricValue}" x:Name="PerfNodeText" Text="-"/></StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}" Padding="16">
+                            <StackPanel><TextBlock Style="{StaticResource MetricLabel}" Text="上次刷新"/>
+                                <TextBlock Style="{StaticResource MetricValue}" x:Name="PerfTimeText" Text="-"/></StackPanel>
+                        </Border>
+                    </UniformGrid>
+                    <WrapPanel Grid.Row="2" Margin="0,0,0,12">
+                        <CheckBox x:Name="PerfAutoCheck" Content="开启定时刷新" VerticalAlignment="Center"
+                                  Checked="PerfAutoCheck_Changed" Unchecked="PerfAutoCheck_Changed" />
+                        <TextBlock x:Name="PerfIntervalText" Style="{StaticResource Muted}" VerticalAlignment="Center" Margin="16,0,0,0" />
+                        <Button Content="立即刷新" Style="{StaticResource GhostButton}" Margin="12,0,0,0" Click="PerfRefreshButton_Click" />
+                        <Button Content="监控设置" Style="{StaticResource GhostButton}" Margin="8,0,0,0" Click="PerfSettingsButton_Click" />
+                    </WrapPanel>
+                    <Grid Grid.Row="3">
+                        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="节点性能" Style="{StaticResource H2}" Margin="0,0,0,10" />
+                        <DataGrid Grid.Row="1" x:Name="PerfGrid">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="节点" Binding="{Binding DisplayName}" Width="2*" />
+                                <DataGridTextColumn Header="地址" Binding="{Binding Endpoint}" Width="2*" />
+                                <DataGridTextColumn Header="CPU" Binding="{Binding CpuText}" Width="*" />
+                                <DataGridTextColumn Header="内存" Binding="{Binding MemText}" Width="*" />
+                                <DataGridTextColumn Header="系统内存" Binding="{Binding SysMemText}" Width="*" />
+                                <DataGridTextColumn Header="状态" Binding="{Binding StateText}" Width="*" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                    <TextBlock Grid.Row="4" Style="{StaticResource Muted}" Margin="0,10,0,0"
+                               Text="提示：CPU 与内存占比取自守护节点上报的数据，定时刷新只读取面板与节点概况，不会影响游戏服务器运行。" />
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

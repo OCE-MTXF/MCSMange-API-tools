@@ -1,0 +1,28 @@
+<Window x:Class="MCSMServerManager.FileEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Icon="/MCSMServerManager;component/ico.ico"
+        Title="编辑文件 - MCSM 服务器管理器 by OCE_MTXF BUG联系oce_mtxf@outlook.com" Height="640" Width="920"
+        Background="{StaticResource BgBrush}"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" x:Name="PathText" Style="{StaticResource H2}"
+                   Margin="0,0,0,4" TextTrimming="CharacterEllipsis" />
+        <TextBlock Grid.Row="1" x:Name="StateText" Style="{StaticResource Muted}" Margin="0,0,0,10" />
+        <TextBox Grid.Row="2" x:Name="EditorBox" AcceptsReturn="True" AcceptsTab="True"
+                 TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto"
+                 HorizontalScrollBarVisibility="Auto"
+                 FontFamily="Consolas, Microsoft YaHei UI" FontSize="12" />
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="保存到服务器" Click="SaveButton_Click" />
+            <Button Content="关闭" Style="{StaticResource GhostButton}" Margin="8,0,0,0"
+                    Click="CloseButton_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

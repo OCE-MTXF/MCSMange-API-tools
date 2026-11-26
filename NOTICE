@@ -1,0 +1,80 @@
+MCSM Server Manager
+Copyright 2026 OCE_MTXF (oce_mtxf@outlook.com)
+
+This product is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License in the LICENSE file distributed
+alongside this product.
+
+--------------------------------------------------------------------------------
+Modifications (Apache-2.0, Section 4)
+--------------------------------------------------------------------------------
+
+This product is an independent work authored from scratch by OCE_MTXF.
+It is NOT a derivative work of, and does not incorporate source code from,
+any third-party project. It communicates with MCSManager solely over the
+public HTTP API documented by that project.
+
+Modifications made by the author of this product, for the avoidance of doubt:
+
+  * This product's own source code, written independently.
+  * Copyright notice changed to "Copyright 2026 OCE_MTXF".
+  * No files from MCSManager or any other project were modified or reused.
+
+--------------------------------------------------------------------------------
+Third-party components referenced
+--------------------------------------------------------------------------------
+
+MCSManager
+  Licensed under the Apache License, Version 2.0.
+  Copyright (c) MCSManager contributors.
+  Source: https://github.com/MCSManager/MCSManager
+  Relationship: API consumer only. No MCSManager source code is bundled,
+  redistributed, or modified in this product. No affiliation or endorsement
+  is implied.
+
+.NET 9 / WPF (Microsoft .NET runtime and Windows Presentation Foundation)
+  Licensed under the MIT License.
+  Copyright (c) .NET Foundation and Contributors.
+  Relationship: framework and runtime dependency, redistributed only as part
+  of the self-contained .NET publish output.
+
+--------------------------------------------------------------------------------
+Interface references and attribution
+--------------------------------------------------------------------------------
+
+MCSManager (web panel)
+  The dashboard layout, sidebar navigation and data presentation in this product
+  were informed by the MCSManager web panel, which is credited here as a
+  courtesy. No MCSManager source code, templates, or assets were copied.
+
+PCL (Plain Craft Launcher)
+  The expandable error dialog in this product - a one-line conclusion with the
+  full response available on demand - was informed by the same interaction
+  pattern popularised by PCL.
+
+  PCL is published by 成都瓜皮龙科技有限公司 (Meloong) under the
+  《PCL 分发有限许可》, which is NOT an open source licence, and its source
+  repository is additionally governed by the 《PCL 存储库合理使用指南》
+  (https://shimo.im/docs/rGrd8pY8xWkt6ryW).
+
+  This product is classified as 轻度使用 (light use) under that guide: only a
+  negligible amount of content was referenced, and this product's substantive
+  function - managing game servers through the MCSManager HTTP API - does not
+  overlap with PCL's substantive function of launching Minecraft.
+
+  To satisfy the two requirements that 轻度使用 places on users:
+
+    1. Attribution. PCL is credited in this NOTICE, in the application's About
+       dialog, and in README.md.
+
+    2. Non-confusion. This product is not PCL. It is not a fork, patch
+       collection, or derivative work of PCL. It uses none of the names
+       "Plain Craft Launcher", "PCL", or "Potato Craft Launcher", and none of
+       PCL's branding, icons, or other assets.
+
+  If this product were ever determined to constitute 重度使用 (heavy use) under
+  the guide, the obligations of that category - including the mandatory
+  "Plain Craft Launcher (PCL)" name prefix - would be honoured first.
+
+This product is not affiliated with, endorsed by, or derived from any launcher
+or game modding tool.
